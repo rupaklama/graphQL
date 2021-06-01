@@ -13,11 +13,12 @@ const schema = require('./schema/schema');
 app.use(
   '/graphql',
   expressGraphQL({
-    //  graphiql - a development tool allows us to make queries against our development server
     // Note - only intended to use for Development server
+    // GraphiQL is an in-browser tool for writing, validating, and testing GraphQL queries
+    // provided by GraphiQL Express library
     graphiql: true,
     // we have to provide 'schema' - A graph of data structure inside of a schema file
-    schema,
+    schema: schema,
   })
 );
 
