@@ -21,6 +21,15 @@ const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
 //   { id: '47', firstName: 'Indira', age: 20 },
 // ];
 
+const CompanyType = new GraphQLObjectType({
+  name: 'Company',
+  fields: () => ({
+    id: { type: GraphQLString },
+    name: { type: GraphQLString },
+    description: { type: GraphQLString },
+  }),
+});
+
 // using GraphQLObjectType to instruct GraphQL about the presence of a 'USER' schema/data
 const UserType = new GraphQLObjectType({
   // name - document/table name
@@ -33,6 +42,19 @@ const UserType = new GraphQLObjectType({
     id: { type: GraphQLString },
     firstName: { type: GraphQLString },
     age: { type: GraphQLInt },
+
+    // adding another data table
+    // similar to foreign key in relational database
+    company: {
+      type: CompanyType,
+
+      // resolve to connect foreign key
+      resolve(parentValue, args) {
+        // console.log(parentValue, args);
+        // parentValue is the Parent Data table - 'User' of this table
+        return axios.get(`http://localhost:3000/companies/${parentValue.companyId}`).then(res => res.data);
+      },
+    },
   }),
 });
 
@@ -51,7 +73,7 @@ const RootQuery = new GraphQLObjectType({
       // very important func which performs the search & get the data
       // parentValue - don't get used very often
       // args - This is an Object which gets call whatever arguments are passed into the original query above - search with id
-      // The purpose of resolve is that it must return a data that represents a 'user object' here
+      // The purpose of resolve is that it must return a data that represents a 'data/document' table/object here
 
       resolve(parentValue, args) {
         // to find a user inside our custom array
