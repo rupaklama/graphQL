@@ -13,7 +13,7 @@ const axios = require('axios');
 
 // GraphQL properties
 // GraphQLSchema - takes in a root query & returns graphQL instance
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLList } = graphql;
 
 // custom data
 // const users = [
@@ -23,10 +23,21 @@ const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
 
 const CompanyType = new GraphQLObjectType({
   name: 'Company',
+  // arrow func is to resolve Circular Reference - variable scope with Closure
   fields: () => ({
     id: { type: GraphQLString },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
+
+    // how to go from Single Company over to list of users
+    users: {
+      // when we go from Company to over users, we have many Users associated to a single company
+      // we have to tell GraphQL, it should expected to get back a list of USERS associated to single company
+      type: new GraphQLList(UserType),
+      resolve(parentValue, args) {
+        return axios.get(`http://localhost:3000/companies/${parentValue.id}/users`).then(res => res.data);
+      },
+    },
   }),
 });
 
@@ -88,6 +99,15 @@ const RootQuery = new GraphQLObjectType({
       // note - We are asking to RootQuery about 'users' in the app
       // if we provide the 'id' of the 'user' that we are looking for
       // RootQuery will return a 'user' back to us
+    },
+
+    // sibling to 'user'
+    company: {
+      type: CompanyType,
+      args: { id: { type: GraphQLString } },
+      resolve(parentValue, args) {
+        return axios.get(`http://localhost:3000/companies/${args.id}`).then(res => res.data);
+      },
     },
   },
 });
