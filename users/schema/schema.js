@@ -23,7 +23,7 @@ const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLList
 
 const CompanyType = new GraphQLObjectType({
   name: 'Company',
-  // arrow func is to resolve Circular Reference - variable scope with Closure
+  // arrow func is to resolve Circular Reference - 'variable scope' with Closure
   fields: () => ({
     id: { type: GraphQLString },
     name: { type: GraphQLString },
@@ -108,6 +108,24 @@ const RootQuery = new GraphQLObjectType({
       resolve(parentValue, args) {
         return axios.get(`http://localhost:3000/companies/${args.id}`).then(res => res.data);
       },
+    },
+  },
+});
+
+// ROOT MUTATION
+const mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    // list of mutations - to change/update data schema
+    addUser: {
+      // name describes an operation
+      type: UserType,
+      args: {
+        firstName: { type: new GraphQLNonNull(GraphQLString) },
+        age: { type: GraphQLInt },
+        companyId: { type: GraphQLString },
+      },
+      resolve() {},
     },
   },
 });
