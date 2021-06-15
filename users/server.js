@@ -14,7 +14,7 @@ app.use(
   '/graphql',
   expressGraphQL({
     // Note - only intended to use for Development server
-    // GraphiQL is an in-browser tool for writing, validating, and testing GraphQL queries
+    // GraphiQL is an in-browser development tool for writing, validating, and testing GraphQL queries
     // provided by GraphiQL Express library
     graphiql: true,
     // we have to provide 'schema' - A graph of data structure inside of a schema file
